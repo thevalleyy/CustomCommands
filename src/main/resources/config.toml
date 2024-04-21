@@ -1,0 +1,17 @@
+# CustomCommands Configuration
+
+# This is the prefix that will be displayed in front of all messages
+# Only supports MiniMessage, see https://docs.advntr.dev/minimessage/format.html and https://webui.advntr.dev/ for more information
+Prefix = "<gray>[<gradient:#38ffdb:#8aff8c>CustomCommands<gray>]"
+
+# This is the default message that will be displayed when a player does not have permission to execute a command
+No-Permission = "<red>You do not have permission to execute this command."
+
+# This is the default message that will be displayed when a command is run from the console, but the command is not allowed to be run from the console
+No-Console-Command = "This command cannot be run from console!"
+
+# This is the default message that will be displayed when a command has been executed successfully
+Command-Executed = "<green>Command executed successfully."
+
+# Do not change this
+Config-Version = 1.0

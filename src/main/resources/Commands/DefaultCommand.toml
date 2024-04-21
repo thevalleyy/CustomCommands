@@ -1,0 +1,26 @@
+# Command Configuration
+
+# Enabled?
+Enabled = true
+
+# This is the command name that will be used to call the command in the chat
+Name = "DefaultCommand"
+
+# These are the aliases
+Aliases = ["Default", "DefaultCmd"]
+
+# This is the description of the command that will be displayed in the help command
+Description = "This is the default command of CustomCommands"
+
+# This is the usage of the command that will be displayed in the help command
+Usage = "DefaultCommand"
+
+# This is the permission required to use the command. Set to None to allow anyone to use the command
+Permission = "CustomCommands.DefaultCommand"
+
+# This is the response that will be sent when the command is called
+# Only supports MiniMessage, see https://docs.advntr.dev/minimessage/format.html and https://webui.advntr.dev/ for more information
+Response = "<green>Command executed successfully!"
+
+# This is the cooldown of the command in seconds
+Cooldown = 0
