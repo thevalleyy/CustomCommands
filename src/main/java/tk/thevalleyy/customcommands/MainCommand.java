@@ -61,41 +61,50 @@ public class MainCommand {
                             return builder.buildFuture();
                         })
                         .executes(context -> {
-                            if (!(context.getSource() instanceof Player)) {
-                                context.getSource().sendMessage(Component.text(CustomCommands.NoConsoleCommand));
-                                return 0;
-                            }
+//                            if (!(context.getSource() instanceof Player)) {
+//                                context.getSource().sendMessage(Component.text(CustomCommands.NoConsoleCommand));
+//                                return 0;
+//                            }
 
                             String argumentProvided = context.getArgument("subcommand", String.class);
                             Player player = (Player) context.getSource();
 
-                            player.sendMessage(Component.text("Running command: " + argumentProvided));
+                            // player.sendMessage(Component.text("Running command: " + argumentProvided));
 
                             // which argument has been provided
                             switch (argumentProvided) {
                                 case "reload":
-                                    // todo: implement config reload
-                                    player.sendMessage(MiniMessage.miniMessage().deserialize(CustomCommands.Prefix + "Config reloaded."));
+                                    // permission check
+                                    if (!player.hasPermission("customcommands.reload") && !player.hasPermission("customcommands.admin")) {
+                                        player.sendMessage(MiniMessage.miniMessage().deserialize(CustomCommands.NoPermission));
+                                        return 0;
+                                    }
+
+                                    // reload config
+                                    ConfigLoader configLoader = new ConfigLoader();
+                                    boolean configLoaded = configLoader.loadConfigVariables(CustomCommands.folder);
+                                    if (!configLoaded) {
+                                        player.sendMessage(MiniMessage.miniMessage().deserialize(CustomCommands.Prefix + "<red>Failed to reload the configuration file. <newline> <gray>Check the console for more information."));
+                                        return 0;
+                                    } else {
+                                        player.sendMessage(MiniMessage.miniMessage().deserialize(CustomCommands.Prefix + "<gray>Config reloaded."));
+                                    }
+
                                     break;
                                 case "help":
                                     player.sendMessage(MiniMessage.miniMessage().deserialize(CustomCommands.Prefix + "Help command"));
                                     break;
                                 case "version":
-                                    player.sendMessage(MiniMessage.miniMessage().deserialize(CustomCommands.Prefix + "Version: " + CustomCommands.Version));
+                                    player.sendMessage(MiniMessage.miniMessage().deserialize(CustomCommands.Prefix + "<hover:show_text:'<gray>Copy to clipboard'><click:copy_to_clipboard:" + CustomCommands.Version + "><gray>v" + CustomCommands.Version));
                                     break;
                                 default:
-                                    player.sendMessage(MiniMessage.miniMessage().deserialize(CustomCommands.Prefix + "Unknown command."));
+                                    player.sendMessage(MiniMessage.miniMessage().deserialize(CustomCommands.Prefix + "<gray>Unknown command."));
                                     break;
                             }
 
                             return Command.SINGLE_SUCCESS;
                         }))
                 .executes(context -> {
-                    if (!(context.getSource() instanceof Player)) {
-                        context.getSource().sendMessage(MiniMessage.miniMessage().deserialize("You must be a player to execute this command."));
-                        return 0;
-                    }
-
                     Player player = (Player) context.getSource();
                     player.sendMessage(MiniMessage.miniMessage().deserialize(CustomCommands.Prefix + "Help command"));
 
