@@ -20,8 +20,8 @@ import java.nio.file.Path;
         version = BuildConstants.VERSION,
         description = "A plugin that allows you to create custom commands.",
         url = "https://github.com/thevalleyy/CustomCommands",
-        authors = {"thevalleyy"}
-)
+        authors = {"thevalleyy"})
+
 public class CustomCommands {
     private boolean isConfigLoaded = false;
     private final ProxyServer proxy;
@@ -38,7 +38,8 @@ public class CustomCommands {
 
     // Construction
     @Inject
-    public CustomCommands(ProxyServer proxy, Logger logger, @DataDirectory final Path folder) throws IOException {
+    public CustomCommands(ProxyServer proxy, Logger logger, @DataDirectory final Path folder)
+            throws IOException {
 
         this.proxy = proxy;
         this.logger = logger;
@@ -58,7 +59,6 @@ public class CustomCommands {
         // logger.info("CustomCommands has been enabled. (" + BuildConstants.VERSION + ")");
     }
 
-
     // Initialization
     @Subscribe
     public void onProxyInitialization(ProxyInitializeEvent event) {
@@ -68,7 +68,8 @@ public class CustomCommands {
 
         CommandManager commandManager = proxy.getCommandManager();
 
-        CommandMeta commandMeta = commandManager.metaBuilder("customcommands").aliases("cc").plugin(this).build();
+        CommandMeta commandMeta =
+                commandManager.metaBuilder("customcommands").aliases("cc").plugin(this).build();
         BrigadierCommand setMainCommand = MainCommand.createBrigadierCommand(proxy);
 
         commandManager.register(commandMeta, setMainCommand);

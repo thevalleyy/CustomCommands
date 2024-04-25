@@ -8,7 +8,7 @@ import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
-public class ConfigLoader {
+public class registerCustomCommands {
     // loading config
     public Toml loadConfig(Path path) {
         File folder = path.toFile();
