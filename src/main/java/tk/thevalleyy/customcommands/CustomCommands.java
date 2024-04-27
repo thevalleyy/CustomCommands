@@ -13,6 +13,8 @@ import org.slf4j.Logger;
 
 import java.io.IOException;
 import java.nio.file.Path;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Plugin(
         id = "customcommands",
@@ -24,7 +26,7 @@ import java.nio.file.Path;
 
 public class CustomCommands {
     private boolean isConfigLoaded = false;
-    private final ProxyServer proxy;
+    private static ProxyServer proxy;
     public static Logger logger;
 
     public static Path folder = null;
@@ -56,6 +58,15 @@ public class CustomCommands {
             isConfigLoaded = true;
         }
 
+        // create an instance of registerCustomCommands
+        registerCustomCommands registerCustomCommands = new registerCustomCommands();
+        Path commandsFolder = Path.of(folder + "/Commands/");
+
+        // create the default command
+        registerCustomCommands.createDefaultCommand(commandsFolder);
+
+        // load all custom commands
+        registerCustomCommands.loadCustomCommands(commandsFolder);
         // logger.info("CustomCommands has been enabled. (" + BuildConstants.VERSION + ")");
     }
 
@@ -73,5 +84,13 @@ public class CustomCommands {
         BrigadierCommand setMainCommand = MainCommand.createBrigadierCommand(proxy);
 
         commandManager.register(commandMeta, setMainCommand);
+    }
+
+    // register commands
+    public static void registerCommand(String name, List<String> aliases, BrigadierCommand command) {
+        CommandManager commandManager = proxy.getCommandManager();
+        CommandMeta commandMeta = commandManager.metaBuilder(name).aliases(aliases.stream().toArray(String[]::new)).plugin(proxy).build();
+
+        commandManager.register(commandMeta, command);
     }
 }
