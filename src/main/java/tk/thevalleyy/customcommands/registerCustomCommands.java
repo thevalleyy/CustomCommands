@@ -2,14 +2,10 @@ package tk.thevalleyy.customcommands;
 
 import com.moandjiezana.toml.Toml;
 import com.mojang.brigadier.Command;
-import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
-import com.mojang.brigadier.builder.RequiredArgumentBuilder;
 import com.mojang.brigadier.tree.LiteralCommandNode;
 import com.velocitypowered.api.command.BrigadierCommand;
 import com.velocitypowered.api.command.CommandSource;
-import com.velocitypowered.api.command.VelocityBrigadierMessage;
-import com.velocitypowered.api.proxy.ProxyServer;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 
 import java.io.File;
@@ -111,6 +107,7 @@ public class registerCustomCommands {
                 String permission = toml.getString("Permission");
                 String response = toml.getString("Response");
                 long cooldown = toml.getLong("Cooldown");
+                // todo: report errors if the values are null to the user (console or in-game)
 
                 // register the command
                 try {

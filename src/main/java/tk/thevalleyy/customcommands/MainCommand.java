@@ -11,6 +11,7 @@ import com.velocitypowered.api.command.VelocityBrigadierMessage;
 import com.velocitypowered.api.proxy.ProxyServer;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -119,6 +120,31 @@ public class MainCommand {
                                                                                         .deserialize(
                                                                                                 CustomCommands.Prefix + "<gray>Config reloaded."));
                                                                     }
+
+                                                                    // create an instance of registerCustomCommands
+                                                                    registerCustomCommands registerCustomCommands = new registerCustomCommands();
+                                                                    Path commandsFolder = Path.of(CustomCommands.folder + "/Commands/");
+
+                                                                    try {
+                                                                        // create the default command
+                                                                        registerCustomCommands.createDefaultCommand(commandsFolder);
+
+                                                                        // load all custom commands
+                                                                        registerCustomCommands.loadCustomCommands(commandsFolder);
+                                                                    } catch (Exception e) {
+                                                                        player.sendMessage(
+                                                                                MiniMessage.miniMessage()
+                                                                                        .deserialize(
+                                                                                                CustomCommands.Prefix
+                                                                                                        + "<red>Failed to reload the custom commands. <newline> <gray>Check the console for more information."));
+                                                                        return 0;
+                                                                    }
+
+                                                                    player.sendMessage(
+                                                                            MiniMessage.miniMessage()
+                                                                                    .deserialize(
+                                                                                            CustomCommands.Prefix + "<gray>Custom commands reloaded."));
+                                                                    
                                                                     break;
 
                                                                 case "help": // display the dynamic generated help message
