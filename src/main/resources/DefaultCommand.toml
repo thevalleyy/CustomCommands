@@ -6,7 +6,7 @@ Enabled = true
 # This is the command name that will be used to call the command in the chat
 Name = "defaultcommand"
 
-# These are the aliases
+# These are the aliases. Empty the array if you don't want any aliases, like so: Aliases = []
 Aliases = ["default", "defaultcmd"]
 
 # This is the description of the command that will be displayed in the help command
@@ -18,6 +18,9 @@ Permission = "customcommands.defaultcommand"
 # This is the response that will be sent when the command is called. Leave empty for no response
 # Only supports MiniMessage, see https://docs.advntr.dev/minimessage/format.html and https://webui.advntr.dev/ for more information
 Response = "<green>Command executed successfully!"
+
+# Add the plugins Prefix configured in config.toml to the response message
+UsePrefix = true
 
 # This is the cooldown of the command in seconds
 Cooldown = 0

@@ -16,12 +16,16 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class MainCommand {
+
     public static BrigadierCommand createBrigadierCommand(final ProxyServer proxy) {
+        registerCustomCommands registerCustomCommands = new registerCustomCommands();
+        Path commandsFolder = Path.of(CustomCommands.folder + "/Commands/");
+
         // list with all commands, description and permission (empty string for no permission)
         List<List<String>> commands = new ArrayList<>();
         commands.add(List.of("reload", "Reload the configuration file", "customcommands.reload"));
         commands.add(List.of("help", "Show the help page", "customcommands.help"));
-        commands.add(List.of("version", "Show the plugins version", "customcommands.version"));
+        commands.add(List.of("version", "Show the plugin's version", "customcommands.version"));
         commands.add(List.of("list", "List all custom commands", "customcommands.list"));
 
         // generate help list for the help command
@@ -112,7 +116,7 @@ public class MainCommand {
                                                                                 MiniMessage.miniMessage()
                                                                                         .deserialize(
                                                                                                 CustomCommands.Prefix
-                                                                                                        + "<red>Failed to reload the configuration file. <newline> <gray>Check the console for more information."));
+                                                                                                        + "<red>Failed to reload the configuration file. <newline>Check the console for more information."));
                                                                         return 0;
                                                                     } else {
                                                                         player.sendMessage(
@@ -121,16 +125,27 @@ public class MainCommand {
                                                                                                 CustomCommands.Prefix + "<gray>Config reloaded."));
                                                                     }
 
-                                                                    // create an instance of registerCustomCommands
-                                                                    registerCustomCommands registerCustomCommands = new registerCustomCommands();
-                                                                    Path commandsFolder = Path.of(CustomCommands.folder + "/Commands/");
-
                                                                     try {
                                                                         // create the default command
-                                                                        registerCustomCommands.createDefaultCommand(commandsFolder);
+                                                                        if (!registerCustomCommands.createDefaultCommand(commandsFolder)) {
+                                                                            player.sendMessage(
+                                                                                    MiniMessage.miniMessage()
+                                                                                            .deserialize(
+                                                                                                    CustomCommands.Prefix
+                                                                                                            + "<red>Failed to reload the custom commands. <newline>Check the console for more information."));
+                                                                            return 0;
+                                                                        }
 
                                                                         // load all custom commands
-                                                                        registerCustomCommands.loadCustomCommands(commandsFolder);
+                                                                        if (!registerCustomCommands.loadCustomCommands(commandsFolder)) {
+                                                                            player.sendMessage(
+                                                                                    MiniMessage.miniMessage()
+                                                                                            .deserialize(
+                                                                                                    CustomCommands.Prefix
+                                                                                                            + "<red>Failed to reload the custom commands. <newline>Check the console for more information."));
+                                                                            return 0;
+                                                                        }
+
                                                                     } catch (Exception e) {
                                                                         player.sendMessage(
                                                                                 MiniMessage.miniMessage()
@@ -144,7 +159,7 @@ public class MainCommand {
                                                                             MiniMessage.miniMessage()
                                                                                     .deserialize(
                                                                                             CustomCommands.Prefix + "<gray>Custom commands reloaded."));
-                                                                    
+
                                                                     break;
 
                                                                 case "help": // display the dynamic generated help message
@@ -153,7 +168,7 @@ public class MainCommand {
                                                                                     .deserialize(
                                                                                             CustomCommands.Prefix
                                                                                                     + "<newline>"
-                                                                                                    + helpList.toString()));
+                                                                                                    + helpList));
                                                                     break;
 
                                                                 case "version": // display the plugin version
@@ -168,11 +183,52 @@ public class MainCommand {
                                                                     break;
 
                                                                 case "list": // list all custom commands
+
+                                                                    List<List<String>> commandList = registerCustomCommands.getCommandList(commandsFolder);
+                                                                    if (commandList == null) {
+                                                                        player.sendMessage(
+                                                                                MiniMessage.miniMessage()
+                                                                                        .deserialize(
+                                                                                                CustomCommands.Prefix
+                                                                                                        + "<red>Failed to list the custom commands. <newline>Check the console for more information."));
+                                                                        return 0;
+                                                                    }
+
+                                                                    StringBuilder list = new StringBuilder();
+                                                                    for (int i = 0; i < commandList.size(); i++) {
+                                                                        List<String> ccmd = commandList.get(i);
+                                                                        list
+                                                                                .append("<gray>")
+                                                                                .append(i + 1)
+                                                                                .append(". ")
+                                                                                .append((ccmd.get(1) == "true") ? "<hover:show_text:'<gray>Enabled'><green>✔</hover> " : "<hover:show_text:'<gray>Disabled'><red>❌</hover> ")
+                                                                                .append("<yellow>/")
+                                                                                .append("<hover:show_text:'<gray>Click to run'><click:suggest_command:/")
+                                                                                .append(ccmd.get(0)) // name
+                                                                                .append(">")
+                                                                                .append(ccmd.get(0))
+                                                                                .append("</click></hover> ")
+                                                                                .append("<gray><hover:show_text:'<gray>")
+                                                                                .append(ccmd.get(2)) // aliases
+                                                                                .append("'><gray>A</hover> :: ")
+                                                                                .append("<gray><hover:show_text:'<gray>")
+                                                                                .append(ccmd.get(3)) // description
+                                                                                .append("'><gray>D</hover> :: ")
+                                                                                .append("<gray><hover:show_text:'<gray>")
+                                                                                .append(ccmd.get(4).isEmpty() ? "None" : ccmd.get(4)) // permission
+                                                                                .append("'><gray>P</hover> :: ")
+                                                                                .append(ccmd.get(6) == "true" ? "<hover:show_text:'<green>✔'><gray>P?</hover>" : "<hover:show_text:'<red>❌'><gray>P?</hover>") // prefix enabled?
+                                                                                .append("\n");
+                                                                    }
+
+
                                                                     player.sendMessage(
                                                                             MiniMessage.miniMessage()
                                                                                     .deserialize(
-                                                                                            CustomCommands.Prefix + "<gray>Custom commands:"));
-                                                                    // todo: list all custom commands
+                                                                                            CustomCommands.Prefix
+                                                                                                    + "<newline>"
+                                                                                                    + list));
+
                                                                     break;
 
                                                                 default: // unknown command
@@ -206,7 +262,7 @@ public class MainCommand {
 
                                     player.sendMessage(
                                             MiniMessage.miniMessage()
-                                                    .deserialize(CustomCommands.Prefix + "<newline>" + helpList.toString()));
+                                                    .deserialize(CustomCommands.Prefix + "<newline>" + helpList));
                                     return Command.SINGLE_SUCCESS;
                                 })
                         .build();

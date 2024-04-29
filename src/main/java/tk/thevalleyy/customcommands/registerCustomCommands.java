@@ -20,32 +20,33 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class registerCustomCommands {
-    public void createDefaultCommand(Path path) {
+    public boolean createDefaultCommand(Path path) {
         File folder = path.toFile();
         File file = new File(folder, "DefaultCommand.toml");
 
-        if (folder.exists()) return;
+        if (folder.exists()) return true;
 
         if (folder.mkdirs()) {
             CustomCommands.logger.info("Creating the default command folder.");
         } else {
             CustomCommands.logger.error("Failed to create the default command folder.");
-            return;
+            return false;
         }
 
         try {
             InputStream input = getClass().getResourceAsStream("/DefaultCommand.toml");
 
             if (input == null) {
-                CustomCommands.logger.error("Failed to load the default command.");
-                return;
+                CustomCommands.logger.error("Failed to read the default command from the jar file.");
+                return false;
             }
 
             Files.copy(input, file.toPath());
         } catch (IOException e) {
             CustomCommands.logger.error(e.getMessage());
+            return false;
         }
-
+        return true;
     }
 
     // search all toml files in the folder
@@ -76,23 +77,18 @@ public class registerCustomCommands {
     }
 
     // load all custom commands
-    public void loadCustomCommands(Path folder) {
+    public boolean loadCustomCommands(Path folder) {
+        boolean noErrors = true;
         try {
             List<Path> tomlFiles = searchTomlFiles(folder);
             for (Path file : tomlFiles) {
-                Toml toml;
-                try {
-                    toml = new Toml().read(file.toFile());
-                } catch (RuntimeException e) {
-                    CustomCommands.logger.error(e.getMessage());
-                    return;
-                }
+
+                Toml toml = new Toml().read(file.toFile());
 
 
                 // does the toml file exist?
                 if (toml == null) {
-                    CustomCommands.logger.error("Failed to load the command: " + file.getFileName());
-                    continue;
+                    throw new Exception("Failed to load the toml file: " + file.getFileName());
                 }
 
                 // is the command enabled?
@@ -106,23 +102,22 @@ public class registerCustomCommands {
                 String description = toml.getString("Description");
                 String permission = toml.getString("Permission");
                 String response = toml.getString("Response");
+                boolean usePrefix = toml.getBoolean("UsePrefix");
                 long cooldown = toml.getLong("Cooldown");
-                // todo: report errors if the values are null to the user (console or in-game)
 
                 // register the command
-                try {
-                    registerCustomCommands.createBrigadierCommand(name, aliases, description, permission, response, cooldown);
-                } catch (Exception e) {
-                    CustomCommands.logger.error("Failed to register the command: " + name);
-                }
+                registerCustomCommands.createBrigadierCommand(name, aliases, description, permission, response, usePrefix, cooldown);
+
             }
-        } catch (IOException e) {
+        } catch (Exception e) {
             CustomCommands.logger.error(e.getMessage());
+            noErrors = false;
         }
+        return noErrors;
     }
 
     // create a brigadier command
-    public static void createBrigadierCommand(String name, List<String> aliases, String description, String permission, String response, long cooldown) {
+    public static void createBrigadierCommand(String name, List<String> aliases, String description, String permission, String response, boolean usePrefix, long cooldown) {
         LiteralCommandNode<CommandSource> command =
                 LiteralArgumentBuilder.<CommandSource>literal(name)
                         .executes(
@@ -136,11 +131,56 @@ public class registerCustomCommands {
 
                                     player.sendMessage(
                                             MiniMessage.miniMessage()
-                                                    .deserialize(CustomCommands.Prefix + response));
+                                                    .deserialize((usePrefix ? CustomCommands.Prefix : "") + response));
                                     return Command.SINGLE_SUCCESS;
                                 })
                         .build();
 
         CustomCommands.registerCommand(name, aliases, new BrigadierCommand(command));
+    }
+
+    public List<List<String>> getCommandList(Path folder) {
+        List<List<String>> commandList = new ArrayList<>();
+        boolean noErrors = true;
+
+        try {
+            List<Path> tomlFiles = searchTomlFiles(folder);
+            for (Path file : tomlFiles) {
+                Toml toml = new Toml().read(file.toFile());
+
+
+                // does the toml file exist?
+                if (toml == null) {
+                    throw new Exception("Failed to load the toml file: " + file.getFileName());
+                }
+
+                // get all the values from the toml file
+                String name = toml.getString("Name");
+                boolean enabled = toml.getBoolean("Enabled");
+                List<String> aliases = toml.getList("Aliases");
+                String description = toml.getString("Description");
+                String permission = toml.getString("Permission");
+                String response = toml.getString("Response");
+                boolean usePrefix = toml.getBoolean("UsePrefix");
+                long cooldown = toml.getLong("Cooldown");
+
+                // create a list with all the commands attributes
+                List<String> commandAttributes = new ArrayList<>();
+                commandAttributes.add(name);
+                commandAttributes.add(String.valueOf(enabled));
+                commandAttributes.add(aliases.toString());
+                commandAttributes.add(description);
+                commandAttributes.add(permission);
+                commandAttributes.add(response);
+                commandAttributes.add(String.valueOf(usePrefix));
+                commandAttributes.add(String.valueOf(cooldown));
+
+                commandList.add(commandAttributes);
+            }
+        } catch (Exception e) {
+            CustomCommands.logger.error(e.getMessage());
+            noErrors = false;
+        }
+        return noErrors ? commandList : null;
     }
 }

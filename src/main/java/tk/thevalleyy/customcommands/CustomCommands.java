@@ -25,7 +25,7 @@ import java.util.stream.Collectors;
         authors = {"thevalleyy"})
 
 public class CustomCommands {
-    private boolean isConfigLoaded = false;
+    private boolean isLoadedCorrectly = true;
     private static ProxyServer proxy;
     public static Logger logger;
 
@@ -53,27 +53,37 @@ public class CustomCommands {
         // load config
         boolean configLoaded = configLoader.loadConfigVariables(folder);
         if (!configLoaded) {
-            logger.error("Disabling plugin functionality.");
-        } else {
-            isConfigLoaded = true;
+            logger.error("Invalid config! Disabling plugin functionality.");
+            isLoadedCorrectly = false;
+            return;
         }
 
         // create an instance of registerCustomCommands
         registerCustomCommands registerCustomCommands = new registerCustomCommands();
         Path commandsFolder = Path.of(folder + "/Commands/");
 
+
         // create the default command
-        registerCustomCommands.createDefaultCommand(commandsFolder);
+        if (!registerCustomCommands.createDefaultCommand(commandsFolder)) {
+            logger.error("Couldn't create default command file. Disabling plugin functionality.");
+            isLoadedCorrectly = false;
+            return;
+        }
 
         // load all custom commands
-        registerCustomCommands.loadCustomCommands(commandsFolder);
+        if (!registerCustomCommands.loadCustomCommands(commandsFolder)) {
+            logger.error("Invalid custom command(s)! Disabling plugin functionality.");
+            isLoadedCorrectly = false;
+            return;
+        }
+
         // logger.info("CustomCommands has been enabled. (" + BuildConstants.VERSION + ")");
     }
 
     // Initialization
     @Subscribe
     public void onProxyInitialization(ProxyInitializeEvent event) {
-        if (!isConfigLoaded) {
+        if (!isLoadedCorrectly) {
             return;
         }
 
