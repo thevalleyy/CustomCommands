@@ -23,7 +23,7 @@ public class MainCommand {
 
         // list with all commands, description and permission (empty string for no permission)
         List<List<String>> commands = new ArrayList<>();
-        commands.add(List.of("reload", "Reload the configuration file", "customcommands.reload"));
+        commands.add(List.of("reload", "Reload the configuration file and all the custom commands", "customcommands.reload"));
         commands.add(List.of("help", "Show the help page", "customcommands.help"));
         commands.add(List.of("version", "Show the plugin's version", "customcommands.version"));
         commands.add(List.of("list", "List all custom commands", "customcommands.list"));
