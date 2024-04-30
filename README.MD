@@ -6,7 +6,7 @@ These commands can be customized to your liking.
 
 ## Installation
 
-1. Download the latest release from the [modrinth](https://modrinth.com/plugin/customcommandsvelocity/versions).
+1. Download the latest release from [modrinth](https://modrinth.com/plugin/customcommandsvelocity/versions).
 2. Put the jar file in `plugins/`.
 3. Restart your server.
 
