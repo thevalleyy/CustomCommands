@@ -37,6 +37,7 @@ public class CustomCommands {
     public static String NoConsoleCommand;
     public static String CommandExecuted;
     public static String ConfigVersion;
+    private static CustomCommands instance;
 
     // Construction
     @Inject
@@ -46,6 +47,7 @@ public class CustomCommands {
         this.proxy = proxy;
         this.logger = logger;
         this.folder = folder;
+        instance = this;
 
         // create an instance of ConfigLoader
         ConfigLoader configLoader = new ConfigLoader();
@@ -99,8 +101,17 @@ public class CustomCommands {
     // register commands
     public static void registerCommand(String name, List<String> aliases, BrigadierCommand command) {
         CommandManager commandManager = proxy.getCommandManager();
-        CommandMeta commandMeta = commandManager.metaBuilder(name).aliases(aliases.stream().toArray(String[]::new)).plugin(proxy).build();
+        CommandMeta commandMeta = commandManager.metaBuilder(name)
+                .aliases(aliases.stream().toArray(String[]::new))
+                .plugin(CustomCommands.getInstance())  // Ensure you're passing the plugin instance
+                .build();
 
         commandManager.register(commandMeta, command);
     }
+
+    // return instance
+    public static CustomCommands getInstance() {
+        return instance;
+    }
+
 }
