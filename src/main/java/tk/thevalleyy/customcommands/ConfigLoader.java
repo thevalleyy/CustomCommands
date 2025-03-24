@@ -9,41 +9,38 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 
 public class ConfigLoader {
-    // loading config
-    public Toml loadConfig(Path path) {
-        File folder = path.toFile();
-        File file = new File(folder, "config.toml");
+    Toml config;
+
+    public boolean loadConfig(Path folder) {
+        File file = new File(folder.toFile(), "config.toml"); // file object (config.toml)
 
         if (!file.getParentFile().exists()) {
-            file.getParentFile().mkdirs();
+            file.getParentFile().mkdirs(); // create plugin folder
         }
 
-        if (!file.exists()) {
-            try (InputStream input = getClass().getResourceAsStream("/" + file.getName())) {
+        if (!file.exists() || file.length() == 0) {
+            try (InputStream input = getClass().getResourceAsStream("/" + file.getName())) { // get the default config file
                 if (input != null) {
                     Files.copy(input, file.toPath());
                 } else {
-                    file.createNewFile();
+                    CustomCommands.logger.error("Failed to read the default config from the jar file. Report this to the plugin developer.");
+                    return false;
                 }
             } catch (IOException e) {
                 CustomCommands.logger.error(e.getMessage());
-                return null;
+                return false;
             }
         }
 
         try {
-            return new Toml().read(file);
+            config = new Toml().read(file);
         } catch (RuntimeException e) {
             CustomCommands.logger.error(e.getMessage());
-            return null;
+            return false;
         }
-    }
 
-    // load config variables
-    public boolean loadConfigVariables(Path folder) {
-        Toml config = loadConfig(folder);
-        if (config == null) {
-            CustomCommands.logger.error("Failed to load the configuration file.");
+        if (config == null || config.isEmpty()) {
+            CustomCommands.logger.error("Failed to load the configuration file."); // fallback
             return false;
         }
 

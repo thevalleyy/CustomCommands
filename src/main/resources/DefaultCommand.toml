@@ -6,7 +6,7 @@ Enabled = true
 # This is the command name that will be used to call the command in the chat
 Name = "defaultcommand"
 
-# These are the aliases. Empty the array if you don't want any aliases, like so: Aliases = []
+# These are the aliases. Empty the array if you don't need any aliases, like so: Aliases = []
 Aliases = ["default", "defaultcmd"]
 
 # This is the description of the command that will be displayed in the help command
@@ -24,3 +24,8 @@ UsePrefix = true
 
 # This is the cooldown of the command in seconds
 Cooldown = 0
+
+# Proxy command to execute. This code is run on console, without any permission checks. Leave empty for no proxy command
+# To view all placeholders, see https://github.com/thevalleyy/CustomCommands?tab=readme-ov-file#placeholders
+# Example: ProxyCommand = "send %player% hub"
+ProxyCommand = ""
